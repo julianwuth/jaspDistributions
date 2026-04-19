@@ -651,7 +651,7 @@
   estimates <- c(estimates, options$fix.pars)
   if(is.null(fitContainer[['estPDF']]) && isTRUE(options$estPDF)){
     pdfplot <- createJaspPlot(title = gettext("Histogram vs. Theoretical PDF"))
-    pdfplot$dependOn(c("estPDF"))
+    pdfplot$dependOn(c("estPDF", "histogramTheoreticalBins"))
     pdfplot$position <- 2
     fitContainer[['estPDF']] <- pdfplot
 
@@ -763,15 +763,19 @@
 }
 
 .ldFillEstPDFPlot <- function(pdfplot, estParameters, options, variable){
+  xBreaks <- jaspGraphs::getPrettyAxisBreaks(variable)
+  xLims   <- range(xBreaks)
+  
   p <- ggplot2::ggplot(data = data.frame(variable = variable), ggplot2::aes(x = variable)) +
-    ggplot2::geom_histogram(ggplot2::aes(y = ..density..), fill = "grey", col = "black") +
+    ggplot2::geom_histogram(ggplot2::aes(y = ..density..), bins = options[["histogramTheoreticalBins"]], fill = "grey", col = "black") +
     ggplot2::stat_function(fun = options[['pdfFun']], args = as.list(estParameters), size = 1.5) +
     ggplot2::geom_rug() +
-    ggplot2::scale_x_continuous(limits = range(variable),
-                                breaks = pretty(range(variable))) +
-    ggplot2::ylab(gettext("Density")) + ggplot2::xlab(options[['variable']])
-
-  p <- jaspGraphs::themeJasp(p)
+    ggplot2::scale_x_continuous(limits = xLims,
+                                breaks = xBreaks) +
+    ggplot2::ylab(gettext("Density")) + 
+    ggplot2::xlab(options[['variable']]) +
+    jaspGraphs::themeJaspRaw() +
+    jaspGraphs::geom_rangeframe(sides = "bl")
 
   pdfplot$plotObject <- p
 

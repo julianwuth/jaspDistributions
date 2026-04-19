@@ -37,6 +37,16 @@ Section
 			name:  isDistributionContinuous ? "estPDF" : "estPMF";
 			label: isDistributionContinuous ? qsTr("Histogram vs. theoretical pdf") : qsTr("Histogram vs. theoretical pmf")
 			info: qsTr("Displays a histogram of the selected variable overlayed with the probability density function of the fitted distribution")
+
+            IntegerField
+            {
+                name: "histogramTheoreticalBins"
+                label: qsTr("Number of bins")
+                defaultValue: 10
+                min: 1
+                enabled: estPDF.checked
+                visible: isDistributionContinuous
+            }
         }
         CheckBox
         {
